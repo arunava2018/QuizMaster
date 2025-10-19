@@ -1,106 +1,135 @@
-"use client"
-import { useState } from "react"
-import Link from "next/link"
-import { Menu, X, Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
-import { useEffect } from "react"
+"use client";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Menu, X, Moon, Sun, Home } from "lucide-react";
+import { useTheme } from "next-themes";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/nextjs";
+
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
+    <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
+          {/* Left Section - Logo */}
           <Link href="/" className="font-bold text-xl text-foreground">
             QuizMaster
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Home
-            </Link>
-            <Link href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Features
-            </Link>
+          {/* Desktop Section */}
+          <div className="hidden md:flex items-center gap-5">
+            {/* Home link */}
             <Link
-              href="#how-it-works"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              href="/"
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              How It Works
+              <Home className="w-5 h-5" />
+              <span>Home</span>
             </Link>
-            <Link href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              FAQ
-            </Link>
-            <Link href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Contact
-            </Link>
-          </div>
 
-          {/* CTA Buttons & Theme Toggle */}
-          <div className="hidden md:flex items-center gap-3">
+            {/* Auth Buttons / Profile */}
+            <SignedOut>
+              <SignInButton mode="redirect">
+                <button className="btn-outline text-sm px-5 py-2 rounded-full">
+                  Sign In
+                </button>
+              </SignInButton>
+              <SignUpButton mode="redirect">
+                <button className="btn-primary text-sm px-5 py-2 rounded-full">
+                  Get Started
+                </button>
+              </SignUpButton>
+            </SignedOut>
+
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
+
+            {/* Theme Toggle */}
             {mounted && (
               <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                onClick={() =>
+                  setTheme(theme === "dark" ? "light" : "dark")
+                }
                 className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
                 aria-label="Toggle theme"
               >
                 {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
               </button>
             )}
-            <button className="btn-outline">Sign In</button>
-            <button className="btn-primary text-sm">Get Started</button>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-2">
             {mounted && (
               <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                onClick={() =>
+                  setTheme(theme === "dark" ? "light" : "dark")
+                }
                 className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
                 aria-label="Toggle theme"
               >
                 {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
               </button>
             )}
-            <button className="p-2" onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
+              aria-label="Toggle menu"
+            >
+              {isOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Dropdown */}
         {isOpen && (
-          <div className="md:hidden pb-4 space-y-3">
-            <Link href="#" className="block text-sm text-muted-foreground hover:text-foreground">
-              Home
+          <div className="md:hidden flex flex-col items-center gap-4 py-4 border-t border-border animate-fadeIn">
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setIsOpen(false)}
+            >
+              <Home className="w-5 h-5" />
+              <span>Home</span>
             </Link>
-            <Link href="#features" className="block text-sm text-muted-foreground hover:text-foreground">
-              Features
-            </Link>
-            <Link href="#how-it-works" className="block text-sm text-muted-foreground hover:text-foreground">
-              How It Works
-            </Link>
-            <Link href="#faq" className="block text-sm text-muted-foreground hover:text-foreground">
-              FAQ
-            </Link>
-            <Link href="#" className="block text-sm text-muted-foreground hover:text-foreground">
-              Contact
-            </Link>
-            <div className="flex gap-2 pt-2">
-              <button className="btn-outline text-sm flex-1">Sign In</button>
-              <button className="btn-primary text-sm flex-1">Get Started</button>
-            </div>
+
+            <SignedOut>
+              <div className="flex flex-col gap-3 w-full px-6">
+                <SignInButton mode="redirect">
+                  <button className="btn-outline text-sm w-full py-2 rounded-full">
+                    Sign In
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="redirect">
+                  <button className="btn-primary text-sm w-full py-2 rounded-full">
+                    Get Started
+                  </button>
+                </SignUpButton>
+              </div>
+            </SignedOut>
+
+            <SignedIn>
+              <div className="pt-2">
+                <UserButton afterSignOutUrl="/" />
+              </div>
+            </SignedIn>
           </div>
         )}
       </div>
     </nav>
-  )
+  );
 }
