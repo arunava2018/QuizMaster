@@ -33,9 +33,9 @@ export default function RootLayout({
           className={`${inter.className} bg-[var(--background)] text-[var(--foreground)]`}
         >
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-            <Navbar />
+            
             {children}
-            <Footer />
+            
           </ThemeProvider>
         </body>
       </html>

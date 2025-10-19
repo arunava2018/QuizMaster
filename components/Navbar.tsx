@@ -1,37 +1,53 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, Moon, Sun, Home } from "lucide-react";
+import { Menu, X, Moon, Sun, Home, Shield } from "lucide-react";
 import { useTheme } from "next-themes";
+import axios from "axios";
 import {
   SignedIn,
   SignedOut,
   SignInButton,
   SignUpButton,
   UserButton,
+  useUser,
 } from "@clerk/nextjs";
 
 export default function Navbar() {
+  const { user } = useUser();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    const checkAdmin = async () => {
+      if (!user?.id) return;
+      try {
+        const { data } = await axios.get("/api/admin/check");
+        setIsAdmin(data.isAdmin);
+      } catch (err) {
+        console.error("Failed to check admin:", err);
+      }
+    };
+    checkAdmin();
+  }, [user]);
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Left Section - Logo */}
+          {/* Logo */}
           <Link href="/" className="font-bold text-xl text-foreground">
             QuizMaster
           </Link>
 
           {/* Desktop Section */}
           <div className="hidden md:flex items-center gap-5">
-            {/* Home link */}
+            {/* Home */}
             <Link
               href="/"
               className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -40,7 +56,18 @@ export default function Navbar() {
               <span>Home</span>
             </Link>
 
-            {/* Auth Buttons / Profile */}
+            {/* Admin Button */}
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Shield className="w-5 h-5" />
+                <span>Admin</span>
+              </Link>
+            )}
+
+            {/* Auth Buttons */}
             <SignedOut>
               <SignInButton mode="redirect">
                 <button className="btn-outline text-sm px-5 py-2 rounded-full">
@@ -72,7 +99,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Section */}
           <div className="md:hidden flex items-center gap-2">
             {mounted && (
               <button
@@ -106,6 +133,17 @@ export default function Navbar() {
               <Home className="w-5 h-5" />
               <span>Home</span>
             </Link>
+
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="flex items-center gap-2 text-sm transition-colors text-muted-foreground hover:text-foreground"
+                onClick={() => setIsOpen(false)}
+              >
+                <Shield className="w-5 h-5" />
+                <span>Admin</span>
+              </Link>
+            )}
 
             <SignedOut>
               <div className="flex flex-col gap-3 w-full px-6">
