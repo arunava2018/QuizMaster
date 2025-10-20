@@ -8,13 +8,13 @@ import Footer from "@/components/Footer"
 export default async function Home() {
   return (
     <main className="min-h-screen bg-background">
-      <Navbar />
+      
       <Hero/>
       <Features/>
       <HowItWorks/>
       <Testimonials/>
       <FAQ/>
-      <Footer />
+      
     </main>
   );
 }

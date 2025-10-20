@@ -12,6 +12,7 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,9 +34,10 @@ export default function RootLayout({
           className={`${inter.className} bg-[var(--background)] text-[var(--foreground)]`}
         >
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-            
+            <Navbar />
             {children}
-            
+            <Toaster richColors position="top-center" />
+            <Footer />
           </ThemeProvider>
         </body>
       </html>
