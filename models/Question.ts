@@ -30,6 +30,10 @@ const QuestionSchema = new Schema(
       enum: ["easy", "medium", "hard"],
       default: "easy",
     },
+    explanation : {
+      type: String,
+      required: [true, "Explanation is required"],
+    }
   },
   { timestamps: true }
 );

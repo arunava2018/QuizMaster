@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     }
 
     // Extract question data
-    const { topicId, questionText, options, correctAnswer, difficulty } =
+    const { topicId, questionText, options, correctAnswer, difficulty, explanation } =
       await req.json();
 
     // Validate required fields
@@ -71,6 +71,7 @@ export async function POST(req: Request) {
       options,
       correctAnswer,
       difficulty: difficulty || "easy",
+      explanation
     });
 
     return NextResponse.json(
