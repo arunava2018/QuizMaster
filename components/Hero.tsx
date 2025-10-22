@@ -1,6 +1,11 @@
+"use client";
 import { ArrowRight, Brain, Trophy, Clock } from "lucide-react";
-
+import { useRouter } from "next/navigation";
 export default function Hero() {
+  const router = useRouter();
+  const handleClick = () => {
+    router.push("/quiz");
+  }
   return (
     <section className="relative overflow-hidden py-15 mb-20 px-6 sm:px-12 lg:px-20 rounded-xl border border-border bg-gradient-to-br from-muted to-background/40 dark:from-muted/40 dark:to-background/20 transition-colors duration-300 m-10 shadow-sm">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
@@ -23,7 +28,7 @@ export default function Hero() {
 
           <div className="flex gap-4 mt-6 flex-col md:flex-row items-center md:items-start">
             {/* Primary CTA */}
-            <button className="btn-primary text-sm flex items-center justify-center gap-2 group px-6 py-2.5 rounded-full font-medium transition-all duration-300">
+            <button className="btn-primary text-sm flex items-center justify-center gap-2 group px-6 py-2.5 rounded-full font-medium transition-all duration-300" onClick={handleClick}>
               <span>Start Quiz</span>
               <ArrowRight
                 size={18}

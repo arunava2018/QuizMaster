@@ -59,3 +59,36 @@ export async function DELETE(
     );
   }
 }
+
+
+//get topic details by id
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params;
+    if (!id) {
+      return NextResponse.json(
+        { message: "Invalid topic ID" },
+        { status: 400 }
+      );
+    }
+    await connectDB();
+    const topic = await Topic.findById(id).lean();
+
+    if (!topic) {
+      return NextResponse.json(
+        { message: "Topic not found" },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({ topic }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching topic:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

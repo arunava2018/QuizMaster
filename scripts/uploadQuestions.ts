@@ -17,5 +17,4 @@ const seedQuestions = async () => {
     console.error("Error seeding questions:", error);
   }
 };
-
 seedQuestions();
