@@ -73,16 +73,6 @@ export default function QuizCards({ topics }: { topics: Topic[] }) {
                     )}
                   </div>
                 </div>
-
-                {index < 3 && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-primary/10 text-primary border-primary/20"
-                  >
-                    <Award className="w-3 h-3 mr-1" />
-                    Top {index + 1}
-                  </Badge>
-                )}
               </div>
 
               <CardDescription className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
