@@ -80,14 +80,30 @@ export default function QuizPage() {
     setTempSelection((prev) => ({ ...prev, [questionId]: answer }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const qid = questions[currentIndex].questionId;
     if (!tempSelection[qid]) {
       toast.error("Please select an option before saving.");
       return;
     }
+
     setSavedAnswers((prev) => ({ ...prev, [qid]: tempSelection[qid] }));
-    toast.success("Response saved.");
+    
+    try {
+      const res = await axios.post(`/api/quiz/${testId}`, {
+        questionId: qid,
+        answer: tempSelection[qid],
+      });
+
+      if (res.data.success) {
+        toast.success("Answer saved successfully.");
+      } else {
+        toast.error("Failed to save answer.");
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to save answer");
+      console.error("Error saving answer:", error);
+    }
   };
 
   const handleNext = () => {
@@ -102,6 +118,7 @@ export default function QuizPage() {
   const handleSubmit = () => {
     toast.success("Quiz submitted. Evaluation coming soon.");
     console.log("Final Saved Answers:", savedAnswers);
+    router.push(`/quiz/result/${testId}`);
   };
 
   if (loading) {

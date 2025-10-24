@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
 import { TestInformation } from "@/models/TestInformation";
+import { auth } from "@clerk/nextjs/server";
 
 interface LeanTest {
   _id: string;
@@ -50,5 +51,48 @@ export async function GET(
       { message: "Internal server error", error: error.message },
       { status: 500 }
     );
+  }
+}
+
+
+export async function POST(
+  req: Request,
+  context: { params: Promise<{ testId: string }> }
+) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ success: false, message: "Unauthorized" });
+    }
+
+    const { testId } = await context.params;
+    const { questionId, selectedAnswer } = await req.json();
+    await connectDB();
+
+    if (!mongoose.Types.ObjectId.isValid(testId) || !mongoose.Types.ObjectId.isValid(questionId)) {
+      return NextResponse.json({ success: false, message: "Invalid IDs" });
+    }
+
+    const test = await TestInformation.findOne({ _id: testId, clerkUserId: userId });
+    if (!test) {
+      return NextResponse.json({ success: false, message: "Test not found" });
+    }
+
+    const existingResponse = test.responses.find(
+      (r: any) => r.questionId.toString() === questionId
+    );
+
+    if (existingResponse) {
+      existingResponse.selectedAnswer = selectedAnswer;
+    } else {
+      test.responses.push({ questionId, selectedAnswer });
+    }
+
+    await test.save();
+
+    return NextResponse.json({ success: true, message: "Response saved." });
+  } catch (error) {
+    console.log("Save response error:", error);
+    return NextResponse.json({ success: false, message: "Server error" });
   }
 }
