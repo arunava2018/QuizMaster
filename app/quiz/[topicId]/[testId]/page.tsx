@@ -92,7 +92,7 @@ export default function QuizPage() {
     try {
       const res = await axios.post(`/api/quiz/${testId}`, {
         questionId: qid,
-        answer: tempSelection[qid],
+        selectedAnswer: tempSelection[qid],
       });
 
       if (res.data.success) {
@@ -115,11 +115,16 @@ export default function QuizPage() {
     setCurrentIndex(index);
   };
 
-  const handleSubmit = () => {
-    toast.success("Quiz submitted. Evaluation coming soon.");
-    console.log("Final Saved Answers:", savedAnswers);
+ const handleSubmit = async () => {
+  try {
+    await axios.post(`/api/topics/${topicId}/attempts`);
+    toast.success("Quiz submitted. Your responses are being evaluated.");
     router.push(`/quiz/result/${testId}`);
-  };
+  } catch (error) {
+    console.error("Error recording user attempt:", error);
+    toast.error("Failed to record user attempt.");
+  }
+};
 
   if (loading) {
     return (
