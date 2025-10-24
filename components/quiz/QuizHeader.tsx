@@ -1,14 +1,21 @@
 "use client";
 
 import { Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface QuizHeaderProps {
   topicId: string | string[] | undefined;
   testId: string | string[] | undefined;
   timeLeft: number;
+  onEnd: () => void;
 }
 
-export default function QuizHeader({ topicId, testId, timeLeft }: QuizHeaderProps) {
+export default function QuizHeader({
+  topicId,
+  testId,
+  timeLeft,
+  onEnd
+}: QuizHeaderProps) {
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -26,12 +33,14 @@ export default function QuizHeader({ topicId, testId, timeLeft }: QuizHeaderProp
           <span className="font-medium">{testId}</span>
         </p>
       </div>
-
-      <div className="flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-lg border border-primary/20 shadow-sm">
-        <Clock className="w-4 h-4 text-primary" />
-        <span className="font-semibold text-primary tracking-wide">
-          {formatTime(timeLeft)}
-        </span>
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-lg border border-primary/20 shadow-sm">
+          <Clock className="w-4 h-4 text-primary" />
+          <span className="font-semibold text-primary tracking-wide">
+            {formatTime(timeLeft)}
+          </span>
+        </div>
+        <Button onClick={onEnd} variant="destructive">End Quiz</Button>
       </div>
     </header>
   );

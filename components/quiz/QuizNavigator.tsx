@@ -39,7 +39,7 @@ export default function QuizNavigator({
             <span className="font-semibold text-green-600">{savedCount}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-yellow-600 font-medium">Attempted but Not Saved:</span>
+            <span className="text-yellow-600 font-medium">Marked as Review:</span>
             <span className="font-semibold text-yellow-600">{tempCount}</span>
           </div>
           <div className="flex justify-between">
@@ -67,13 +67,13 @@ export default function QuizNavigator({
 
             if (saved) {
               buttonClass =
-                "bg-green-600 hover:bg-green-700 text-white border-green-600";
+                "bg-green-600 hover:bg-green-700 text-white border-green-600 dark:border-green-600 dark:bg-green-600 dark:hover:bg-green-700 ";
             } else if (temp) {
               buttonClass =
-                "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500";
+                "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 dark:border-yellow-500 dark:bg-yellow-500 dark:hover:bg-yellow-600";
             } else {
               buttonClass =
-                "bg-muted hover:bg-muted/80 text-muted-foreground border-border";
+                "bg-muted hover:bg-muted/80 text-muted-foreground border-border dark:border-border";
             }
 
             return (
@@ -113,11 +113,11 @@ export default function QuizNavigator({
           </div>
           <div className="flex items-center gap-2">
             <span className="text-yellow-600">●</span>
-            <span>Attempted but Not Saved</span>
+            <span>Marked as Review</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-gray-500">●</span>
-            <span>Not Started</span>
+            <span>Not Attempted</span>
           </div>
         </div>
       </div>

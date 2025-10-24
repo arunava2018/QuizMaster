@@ -40,7 +40,7 @@ export default function QuizQuestionCard({
             ? "border-yellow-200 shadow-yellow-100/50 dark:border-yellow-800 dark:shadow-yellow-900/20"
             : "border-border/40 hover:shadow-xl"
       }`}>
-        <CardHeader className="pb-6">
+        <CardHeader>
           <CardTitle className="text-xl font-semibold leading-relaxed text-foreground">
             {questionText}
           </CardTitle>

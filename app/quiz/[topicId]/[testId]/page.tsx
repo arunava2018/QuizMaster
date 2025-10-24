@@ -26,10 +26,14 @@ export default function QuizPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Temporary selection (not saved)
-  const [tempSelection, setTempSelection] = useState<{ [key: string]: string }>({});
+  const [tempSelection, setTempSelection] = useState<{ [key: string]: string }>(
+    {}
+  );
 
   // Saved responses (final)
-  const [savedAnswers, setSavedAnswers] = useState<{ [key: string]: string }>({});
+  const [savedAnswers, setSavedAnswers] = useState<{ [key: string]: string }>(
+    {}
+  );
 
   const [timeLeft, setTimeLeft] = useState(20 * 60); // 20 minutes
 
@@ -39,6 +43,8 @@ export default function QuizPage() {
     const fetchQuiz = async () => {
       try {
         setLoading(true);
+        // create a small delay to show loading state
+        await new Promise((resolve) => setTimeout(resolve, 5000)); // 500ms delay
         const res = await axios.get(`/api/quiz/${testId}`);
 
         if (res.data.success && res.data.questions?.length > 0) {
@@ -85,20 +91,11 @@ export default function QuizPage() {
   };
 
   const handleNext = () => {
-    const qid = questions[currentIndex].questionId;
-    if (!savedAnswers[qid]) {
-      toast.warning("Save your response before going to the next question.");
-      return;
-    }
-    if (currentIndex < questions.length - 1) setCurrentIndex((prev) => prev + 1);
+    if (currentIndex < questions.length - 1)
+      setCurrentIndex((prev) => prev + 1);
   };
 
   const handleJump = (index: number) => {
-    const qid = questions[currentIndex].questionId;
-    if (!savedAnswers[qid]) {
-      toast.warning("Save your response before changing questions.");
-      return;
-    }
     setCurrentIndex(index);
   };
 
@@ -109,8 +106,39 @@ export default function QuizPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground text-lg">Loading quiz...</p>
+      <div className="min-h-screen flex flex-col items-center justify-center space-y-6">
+        {/* Animated Spinner */}
+        <div className="relative">
+          {/* Outer rotating ring */}
+          <div className="w-16 h-16 border-4 border-muted rounded-full animate-spin border-t-primary"></div>
+          {/* Inner pulsing dot */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-6 h-6 bg-primary/60 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+
+        {/* Loading Content */}
+        <div className="text-center space-y-2 max-w-md">
+          <h2 className="text-xl font-semibold text-foreground">
+            Preparing Your Quiz
+          </h2>
+          <p className="text-muted-foreground">
+            Setting up questions and initializing your test environment...
+          </p>
+        </div>
+
+        {/* Progress Indicator */}
+        <div className="flex items-center space-x-1">
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+          <div
+            className="w-2 h-2 bg-primary rounded-full animate-bounce"
+            style={{ animationDelay: "0.1s" }}
+          ></div>
+          <div
+            className="w-2 h-2 bg-primary rounded-full animate-bounce"
+            style={{ animationDelay: "0.2s" }}
+          ></div>
+        </div>
       </div>
     );
   }
@@ -127,7 +155,12 @@ export default function QuizPage() {
 
   return (
     <div className="min-h-screen">
-      <QuizHeader topicId={topicId} testId={testId} timeLeft={timeLeft} />
+      <QuizHeader
+        onEnd={handleSubmit}
+        topicId={topicId}
+        testId={testId}
+        timeLeft={timeLeft}
+      />
 
       <div className="container mx-auto px-4 py-6 max-w-[1400px]">
         <div className="flex gap-8">
