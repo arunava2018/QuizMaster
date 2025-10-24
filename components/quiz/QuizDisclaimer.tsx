@@ -1,10 +1,11 @@
 "use client";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { toast } from "sonner";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,9 +21,7 @@ import {
   Monitor,
   FileText,
   Award,
-  Info,
 } from "lucide-react";
-import { useState } from "react";
 
 interface Topic {
   _id: string;
@@ -33,14 +32,32 @@ interface Topic {
 
 interface QuizDisclaimerProps {
   topic: Topic;
-  onStart: () => void;
 }
 
-export default function QuizDisclaimer({ topic, onStart }: QuizDisclaimerProps) {
+export default function QuizDisclaimer({ topic }: QuizDisclaimerProps) {
+  const router = useRouter();
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [acknowledgedRules, setAcknowledgedRules] = useState(false);
 
   const canStart = agreedToTerms && acknowledgedRules;
+
+  const handleStartQuiz = async () => {
+    try {
+      const res = await axios.post(`/api/quiz/start?topicId=${topic._id}`);
+      const { testId } = res.data;
+
+      if (!testId) {
+        toast.error("Failed to initialize test session");
+        return;
+      }
+
+      toast.success("Quiz started successfully");
+      router.push(`/quiz/${topic._id}/${testId}`);
+    } catch (err: any) {
+      console.error("Error starting quiz:", err);
+      toast.error(err.response?.data?.message || "Failed to start quiz");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
@@ -107,7 +124,9 @@ export default function QuizDisclaimer({ topic, onStart }: QuizDisclaimerProps) 
                   <div className="flex items-center gap-3 bg-background/50 rounded-lg p-4">
                     <Award className="w-5 h-5 text-primary" />
                     <div>
-                      <div className="font-semibold text-md">No Negative Marking</div>
+                      <div className="font-semibold text-md">
+                        No Negative Marking
+                      </div>
                       <div className="text-sm text-muted-foreground">
                         Equal Weightage
                       </div>
@@ -124,8 +143,8 @@ export default function QuizDisclaimer({ topic, onStart }: QuizDisclaimerProps) 
                 </AlertTitle>
                 <AlertDescription className="text-amber-700 dark:text-amber-300 mt-2 space-y-2">
                   <p>
-                    This is a <strong>timed assessment</strong>. Once started, the timer
-                    cannot be paused or reset.
+                    This is a <strong>timed assessment</strong>. Once started,
+                    the timer cannot be paused or reset.
                   </p>
                   <p className="text-sm">
                     Ensure a stable internet connection throughout the test.
@@ -150,7 +169,8 @@ export default function QuizDisclaimer({ topic, onStart }: QuizDisclaimerProps) 
                       <div>
                         <h4 className="font-medium">Time Management</h4>
                         <p className="text-sm text-muted-foreground">
-                          The timer begins as soon as you start. Manage your time carefully across all questions.
+                          The timer begins as soon as you start. Manage your
+                          time carefully across all questions.
                         </p>
                       </div>
                     </div>
@@ -160,7 +180,8 @@ export default function QuizDisclaimer({ topic, onStart }: QuizDisclaimerProps) 
                       <div>
                         <h4 className="font-medium">Browser Guidelines</h4>
                         <p className="text-sm text-muted-foreground">
-                          Avoid switching tabs or minimizing the window. This may lead to auto-submission.
+                          Avoid switching tabs or minimizing the window. This
+                          may lead to auto-submission.
                         </p>
                       </div>
                     </div>
@@ -170,7 +191,8 @@ export default function QuizDisclaimer({ topic, onStart }: QuizDisclaimerProps) 
                       <div>
                         <h4 className="font-medium">Academic Integrity</h4>
                         <p className="text-sm text-muted-foreground">
-                          Complete this test independently. External assistance is strictly prohibited.
+                          Complete this test independently. External assistance
+                          is strictly prohibited.
                         </p>
                       </div>
                     </div>
@@ -198,8 +220,9 @@ export default function QuizDisclaimer({ topic, onStart }: QuizDisclaimerProps) 
                       htmlFor="terms"
                       className="text-sm leading-relaxed cursor-pointer"
                     >
-                      I have read and understand the assessment guidelines, rules, and
-                      requirements. I acknowledge that this is a timed, independent evaluation.
+                      I have read and understand the assessment guidelines,
+                      rules, and requirements. I acknowledge that this is a
+                      timed, independent evaluation.
                     </label>
                   </div>
 
@@ -216,8 +239,9 @@ export default function QuizDisclaimer({ topic, onStart }: QuizDisclaimerProps) 
                       htmlFor="rules"
                       className="text-sm leading-relaxed cursor-pointer"
                     >
-                      I understand that auto-submission will occur when time expires, and
-                      I confirm I have a stable internet connection.
+                      I understand that auto-submission will occur when time
+                      expires, and I confirm I have a stable internet
+                      connection.
                     </label>
                   </div>
                 </div>
@@ -241,7 +265,7 @@ export default function QuizDisclaimer({ topic, onStart }: QuizDisclaimerProps) 
                       : "opacity-50 cursor-not-allowed"
                   }`}
                   disabled={!canStart}
-                  onClick={onStart}
+                  onClick={handleStartQuiz}
                 >
                   {canStart && (
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-1000" />

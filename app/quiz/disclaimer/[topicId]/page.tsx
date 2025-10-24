@@ -13,8 +13,8 @@ interface Topic {
   userAttempted: number;
 }
 
+
 export default function QuizDisclaimerPage() {
-  const router = useRouter();
   const { topicId } = useParams() as { topicId: string };
   const [topic, setTopic] = useState<Topic | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,7 +54,6 @@ export default function QuizDisclaimerPage() {
     <div className="container mx-auto px-4 py-10 max-w-3xl">
       <QuizDisclaimer
         topic={topic}
-        onStart={() => router.push(`/quiz/${topicId}`)}
       />
     </div>
   );

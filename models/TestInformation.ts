@@ -2,14 +2,9 @@ import mongoose, { Schema, model, models } from "mongoose";
 
 const TestInformationSchema = new Schema(
   {
-    user: {
-      userId: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
-      name: String,
-      email: String,
+    clerkUserId: {
+      type: String,
+      required: true,
     },
 
     topicId: {
