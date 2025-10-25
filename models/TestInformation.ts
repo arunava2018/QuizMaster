@@ -12,7 +12,6 @@ const TestInformationSchema = new Schema(
       ref: "Topic",
       required: true,
     },
-
     questions: [
       {
         questionId: {
@@ -43,7 +42,10 @@ const TestInformationSchema = new Schema(
         },
       },
     ],
-
+    calculatedScore: {
+      type : Boolean,
+      default: false,
+    },
     score: {
       type: Number,
       default: 0,

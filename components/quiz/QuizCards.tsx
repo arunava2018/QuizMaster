@@ -79,16 +79,6 @@ export default function QuizCards({ topics }: { topics: Topic[] }) {
                 {topic.description}
               </CardDescription>
 
-              {/* Popularity Progress */}
-              {popularityScore > 0 && (
-                <div className="mt-3">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                    <span>Popularity</span>
-                    <span>{Math.round(popularityScore)}%</span>
-                  </div>
-                  <Progress value={popularityScore} className="h-1.5" />
-                </div>
-              )}
             </CardHeader>
 
             <CardContent className="pt-0">

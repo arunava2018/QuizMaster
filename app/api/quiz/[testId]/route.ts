@@ -7,6 +7,7 @@ import { auth } from "@clerk/nextjs/server";
 interface LeanTest {
   _id: string;
   topicId: string;
+  status?: string;
   questions: {
     questionId: string;
     questionText: string;
@@ -32,7 +33,9 @@ export async function GET(
     if (!test) {
       return NextResponse.json({ message: "Test not found" }, { status: 404 });
     }
-
+    if(test.status === 'completed'){
+      return NextResponse.json({ message: "Test already completed" }, { status: 403 });
+    }
     const sanitizedQuestions = test.questions.map((q) => ({
       questionId: q.questionId,
       questionText: q.questionText,

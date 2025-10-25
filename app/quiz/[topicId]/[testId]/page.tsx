@@ -22,6 +22,7 @@ export default function QuizPage() {
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
+  const [completed, setCompleted] = useState(false); // new state to show completed UI
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -43,19 +44,30 @@ export default function QuizPage() {
     const fetchQuiz = async () => {
       try {
         setLoading(true);
-        // create a small delay to show loading state
-        await new Promise((resolve) => setTimeout(resolve, 5000)); // 500ms delay
+        // small delay to show loading state
+        await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms delay
         const res = await axios.get(`/api/quiz/${testId}`);
 
+        // server may return success payload
         if (res.data.success && res.data.questions?.length > 0) {
           setQuestions(res.data.questions);
+        } else if (res.data.message === "Test already completed") {
+          setCompleted(true);
+          toast.info("This test has already been completed.");
         } else {
           toast.error("No questions found for this quiz");
           router.push("/quiz");
         }
-      } catch (error) {
-        toast.error("Failed to load quiz");
-        router.push("/quiz");
+      } catch (error: any) {
+        // handle axios / HTTP errors explicitly
+        if (axios.isAxiosError(error) && error.response?.status === 403) {
+          // test already completed
+          setCompleted(true);
+          toast.info("This test has already been completed.");
+        } else {
+          toast.error("Failed to load quiz");
+          router.push("/quiz");
+        }
       } finally {
         setLoading(false);
       }
@@ -88,7 +100,7 @@ export default function QuizPage() {
     }
 
     setSavedAnswers((prev) => ({ ...prev, [qid]: tempSelection[qid] }));
-    
+
     try {
       const res = await axios.post(`/api/quiz/${testId}`, {
         questionId: qid,
@@ -107,24 +119,26 @@ export default function QuizPage() {
   };
 
   const handleNext = () => {
-    if (currentIndex < questions.length - 1)
-      setCurrentIndex((prev) => prev + 1);
+    if (currentIndex < questions.length - 1) setCurrentIndex((prev) => prev + 1);
   };
 
   const handleJump = (index: number) => {
     setCurrentIndex(index);
   };
 
- const handleSubmit = async () => {
-  try {
-    await axios.post(`/api/topics/${topicId}/attempts`);
-    toast.success("Quiz submitted. Your responses are being evaluated.");
-    router.push(`/quiz/result/${testId}`);
-  } catch (error) {
-    console.error("Error recording user attempt:", error);
-    toast.error("Failed to record user attempt.");
-  }
-};
+  const handleSubmit = async () => {
+    try {
+      await axios.post(`/api/topics/${topicId}/attempts`);
+      //calculate time taken
+      const timeTaken = 20 * 60 - timeLeft;
+      await axios.post(`/api/quiz/${testId}/timer`, { timeTaken });
+      toast.success("Quiz submitted. Your responses are being evaluated.");
+      router.push(`/quiz/result/${testId}`);
+    } catch (error) {
+      console.error("Error recording user attempt:", error);
+      toast.error("Failed to record user attempt.");
+    }
+  };
 
   if (loading) {
     return (
@@ -165,6 +179,35 @@ export default function QuizPage() {
     );
   }
 
+  // Show friendly UI when server indicates test already completed (403)
+  if (completed) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="w-full max-w-xl bg-white dark:bg-background rounded-lg shadow-md p-8 text-center">
+          <h2 className="text-2xl font-semibold mb-2">Test Completed</h2>
+          <p className="text-muted-foreground mb-6">
+            This test session has already been completed. You can view your results or return to the quiz list.
+          </p>
+
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => router.push(`/quiz/result/${testId}`)}
+              className="px-6 py-2 bg-accent rounded hover:opacity-95"
+            >
+              View Results
+            </button>
+            <button
+              onClick={() => router.push("/quiz")}
+              className="px-6 py-2 border rounded"
+            >
+              Back to Quizzes
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (questions.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -177,12 +220,7 @@ export default function QuizPage() {
 
   return (
     <div className="min-h-screen">
-      <QuizHeader
-        onEnd={handleSubmit}
-        topicId={topicId}
-        testId={testId}
-        timeLeft={timeLeft}
-      />
+      <QuizHeader onEnd={handleSubmit} topicId={topicId} testId={testId} timeLeft={timeLeft} />
 
       <div className="container mx-auto px-4 py-6 max-w-[1400px]">
         <div className="flex gap-8">
@@ -194,9 +232,7 @@ export default function QuizPage() {
               options={currentQuestion.options}
               selectedAnswer={tempSelection[currentQuestion.questionId]}
               isSaved={!!savedAnswers[currentQuestion.questionId]}
-              onSelect={(answer) =>
-                handleAnswerSelect(currentQuestion.questionId, answer)
-              }
+              onSelect={(answer) => handleAnswerSelect(currentQuestion.questionId, answer)}
             />
 
             <QuizFooter
