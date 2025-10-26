@@ -62,15 +62,7 @@ export default function QuizCards({ topics }: { topics: Topic[] }) {
                     <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors">
                       {topic.title}
                     </CardTitle>
-                    {isHot && (
-                      <Badge
-                        variant="destructive"
-                        className="flex items-center gap-1 animate-pulse bg-orange-500 hover:bg-orange-600"
-                      >
-                        <Flame className="w-3 h-3" />
-                        Hot
-                      </Badge>
-                    )}
+                    
                   </div>
                 </div>
               </div>
@@ -121,8 +113,8 @@ export default function QuizCards({ topics }: { topics: Topic[] }) {
             {/* Trending Indicator */}
             {isHot && (
               <div className="absolute top-2 right-2">
-                <div className="flex items-center space-x-1 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
-                  <TrendingUp className="w-3 h-3" />
+                <div className="flex items-center gap-1 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+                  <TrendingUp className="w-2 h-2" />
                   <span>Trending</span>
                 </div>
               </div>
