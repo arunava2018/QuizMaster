@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, Moon, Sun, Home, Shield } from "lucide-react";
+import { Menu, X, Moon, Sun, Home, Shield, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import axios from "axios";
 import {
@@ -15,7 +15,7 @@ import {
 } from "@clerk/nextjs";
 
 export default function Navbar() {
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -67,6 +67,16 @@ export default function Navbar() {
               </Link>
             )}
 
+            {isSignedIn && (
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <User className="w-5 h-5" />
+                <span>Profile</span>
+              </Link>
+            )}
+
             {/* Auth Buttons */}
             <SignedOut>
               <SignInButton mode="redirect">
@@ -88,9 +98,7 @@ export default function Navbar() {
             {/* Theme Toggle */}
             {mounted && (
               <button
-                onClick={() =>
-                  setTheme(theme === "dark" ? "light" : "dark")
-                }
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
                 aria-label="Toggle theme"
               >
@@ -103,9 +111,7 @@ export default function Navbar() {
           <div className="md:hidden flex items-center gap-2">
             {mounted && (
               <button
-                onClick={() =>
-                  setTheme(theme === "dark" ? "light" : "dark")
-                }
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
                 aria-label="Toggle theme"
               >
@@ -142,6 +148,17 @@ export default function Navbar() {
               >
                 <Shield className="w-5 h-5" />
                 <span>Admin</span>
+              </Link>
+            )}
+
+            {isSignedIn && (
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 text-sm transition-colors text-muted-foreground hover:text-foreground"
+                onClick={() => setIsOpen(false)}
+              >
+                <User className="w-5 h-5" />
+                <span>Profile</span>
               </Link>
             )}
 
