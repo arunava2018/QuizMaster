@@ -1,9 +1,10 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, Moon, Sun, Home, Shield, User } from "lucide-react";
 import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import {
   SignedIn,
@@ -20,6 +21,7 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const router = useRouter();
 
   useEffect(() => setMounted(true), []);
 
@@ -35,6 +37,12 @@ export default function Navbar() {
     };
     checkAdmin();
   }, [user]);
+  const handleClick = () => {
+    if (user?.id) {
+      router.push(`/profile/${user.id}`);
+    }
+    setIsOpen(false);
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md transition-colors">
@@ -68,13 +76,14 @@ export default function Navbar() {
             )}
 
             {isSignedIn && (
-              <Link
-                href="/profile"
-                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              <Button
+                variant="ghost"
+                onClick={handleClick} 
+                className="flex cursor-pointer items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 <User className="w-5 h-5" />
                 <span>Profile</span>
-              </Link>
+              </Button>
             )}
 
             {/* Auth Buttons */}
@@ -152,14 +161,14 @@ export default function Navbar() {
             )}
 
             {isSignedIn && (
-              <Link
-                href="/profile"
+              <Button
+                variant="ghost"
                 className="flex items-center gap-2 text-sm transition-colors text-muted-foreground hover:text-foreground"
-                onClick={() => setIsOpen(false)}
+                onClick={handleClick}
               >
                 <User className="w-5 h-5" />
                 <span>Profile</span>
-              </Link>
+              </Button>
             )}
 
             <SignedOut>

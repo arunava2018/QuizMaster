@@ -8,14 +8,14 @@ const TestInformationSchema = new Schema(
     },
 
     topicId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Topic",
       required: true,
     },
     questions: [
       {
         questionId: {
-          type: Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: "Question",
           required: true,
         },

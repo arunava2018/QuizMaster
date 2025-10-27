@@ -3,7 +3,7 @@ import mongoose, { Schema, model, models } from "mongoose";
 const TopicTestInfoSchema = new Schema(
   {
     topicId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Topic",
       required: true,
     },

@@ -1,15 +1,21 @@
 import { User } from "@/models/User";
-import { Topic } from "@/models/Topics";
+import "@/models/Topics";
 import { connectDB } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request, { params }: { params: { clerkId: string } }) {
+export async function GET(
+  req: Request, 
+  { params }: { params: Promise<{ clerkId: string }> }
+) {
   try {
-    const { clerkId } = params;
+    const { clerkId } = await params;
     await connectDB();
 
     const user = await User.findOne({ clerkUserId: clerkId })
-      .populate("testInfo.topicId");
+      .populate({
+        path: "testInfo.topicId",
+        model: "Topic"
+      });
 
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -17,9 +23,9 @@ export async function GET(req: Request, { params }: { params: { clerkId: string 
 
     let totalTestsAttempted = 0;
 
-    const topicsData = user.testInfo.map((test:any) => {
-      const topic = test.topicId; 
-      const scoreValues = test.scores.map((s:any) => s.score);
+    const topicsData = user.testInfo.map((test: any) => {
+      const topic = test.topicId;
+      const scoreValues = test.scores.map((s: any) => s.score);
 
       totalTestsAttempted += scoreValues.length;
 
