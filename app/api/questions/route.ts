@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { connectDB } from "@/lib/db";
 import { AdminUser } from "@/models/AdminUser";
@@ -6,7 +6,7 @@ import { Question } from "@/models/Question";
 import { Topic } from "@/models/Topics";
 
 // Add new question — only admins can do this
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {

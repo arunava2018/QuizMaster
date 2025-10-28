@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
 import { TestInformation } from "@/models/TestInformation";
@@ -17,7 +17,7 @@ interface LeanTest {
 }
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   context: { params: Promise<{ testId: string }> }
 ) {
   try {

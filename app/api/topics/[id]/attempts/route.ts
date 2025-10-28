@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { connectDB } from "@/lib/db";
 import { Topic } from "@/models/Topics";
 
 //increase userAttempts count in Topic model
-export async function POST(req: Request,context: { params: Promise<{ id: string }> }){
+export async function POST(req: NextRequest,context: { params: Promise<{ id: string }> }){
     try{
         const { userId } = await auth();
         if(!userId){

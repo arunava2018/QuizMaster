@@ -1,13 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
 import { TestInformation } from "@/models/TestInformation";
 import { Question } from "@/models/Question";
 
-export async function GET(request: Request, { params }: { params: { testId: string } }) {
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ testId: string }> }
+) {
   try {
+    const { testId } = await context.params; // Await params
     await connectDB();
-    const { testId } = params;
 
     if (!mongoose.Types.ObjectId.isValid(testId)) {
       return NextResponse.json({ success: false, message: "Invalid test id" }, { status: 400 });
@@ -21,7 +24,6 @@ export async function GET(request: Request, { params }: { params: { testId: stri
     // Build review data
     const reviewData = await Promise.all(
       (testInfo.questions as any[]).map(async (question) => {
-        
         const response = (testInfo.responses as any[]).find(
           (r: any) => r.questionId.toString() === question.questionId.toString()
         );
@@ -34,10 +36,8 @@ export async function GET(request: Request, { params }: { params: { testId: stri
           questionText: question.questionText,
           options: question.options,
           correctAnswer: question.correctAnswer,
-
           selectedAnswer: response?.selectedAnswer || null,
           isCorrect: response?.isCorrect ?? false,
-
           explanation: fullQuestionData?.explanation || "No explanation provided",
         };
       })
@@ -50,8 +50,7 @@ export async function GET(request: Request, { params }: { params: { testId: stri
         timeTaken: testInfo.timeTaken,
         review: reviewData,
       },
-    }, { status: 200 });
-
+    });
   } catch (error) {
     console.error("Error fetching review:", error);
     return NextResponse.json({ success: false, message: "Server error" }, { status: 500 });

@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
 import { TestInformation } from "@/models/TestInformation";
 import { User } from "@/models/User";
 
-export async function GET(request: Request, { params }: { params: { testId: string } }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ testId: string }> }) {
   try {
+    const { testId } = await context.params; 
     await connectDB();
-    const { testId } = params;
 
     if (!mongoose.Types.ObjectId.isValid(testId)) {
       return NextResponse.json({ success: false, message: "Invalid test id" }, { status: 400 });
@@ -21,10 +21,9 @@ export async function GET(request: Request, { params }: { params: { testId: stri
     const totalQuestions = testInfo.questions.length;
     const attempted = (testInfo.responses || []).filter((r: any) => r.selectedAnswer != null).length;
 
-    // If score was previously calculated, just return the stored stats
+    // If score already calculated
     if (testInfo.calculatedScore) {
       const accuracy = totalQuestions > 0 ? Math.round((testInfo.score / totalQuestions) * 100) : 0;
-
       return NextResponse.json({
         success: true,
         message: "Test already completed",
@@ -33,18 +32,17 @@ export async function GET(request: Request, { params }: { params: { testId: stri
         attempted,
         accuracy,
         timeTaken: testInfo.timeTaken || 0,
-      }, { status: 200 });
+      });
     }
 
-    // Calculate Score if not done
+    // Calculate score
     let score = 0;
-
     (testInfo.responses as any[]).forEach((response: any) => {
       const question = (testInfo.questions as any[]).find(
         (q: any) => q.questionId.toString() === response.questionId.toString()
       );
       if (question && response.selectedAnswer === question.correctAnswer) {
-        score += 1;
+        score++;
         response.isCorrect = true;
       } else {
         response.isCorrect = false;
@@ -58,7 +56,7 @@ export async function GET(request: Request, { params }: { params: { testId: stri
     testInfo.markModified("responses");
     await testInfo.save();
 
-    // Store score in User Performance History
+    // Update user performance
     const user = await User.findOne({ clerkUserId: testInfo.clerkUserId });
     if (user) {
       const topicIdStr = testInfo.topicId.toString();
@@ -89,14 +87,13 @@ export async function GET(request: Request, { params }: { params: { testId: stri
       attempted,
       accuracy,
       timeTaken: testInfo.timeTaken || 0,
-    }, { status: 200 });
-
+    });
   } catch (error: any) {
     console.error("Error calculating test result:", error);
     return NextResponse.json({
       success: false,
       message: "Internal Server Error",
-      error: error?.message
+      error: error?.message,
     }, { status: 500 });
   }
 }
