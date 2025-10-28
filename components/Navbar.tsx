@@ -89,12 +89,12 @@ export default function Navbar() {
             {/* Auth Buttons */}
             <SignedOut>
               <SignInButton mode="redirect">
-                <button className="btn-outline text-sm px-5 py-2 rounded-full">
+                <button className="btn-outline cursor-pointer text-sm px-5 py-2 rounded-full">
                   Sign In
                 </button>
               </SignInButton>
               <SignUpButton mode="redirect">
-                <button className="btn-primary text-sm px-5 py-2 rounded-full">
+                <button className="cursor-pointer btn-primary text-sm px-5 py-2 rounded-full">
                   Get Started
                 </button>
               </SignUpButton>
@@ -129,7 +129,7 @@ export default function Navbar() {
             )}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
+              className="p-2 cursor-pointer rounded-lg border border-border hover:bg-muted transition-colors"
               aria-label="Toggle menu"
             >
               {isOpen ? <X size={22} /> : <Menu size={22} />}
