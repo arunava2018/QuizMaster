@@ -41,7 +41,7 @@ export default function QuizQuestionCard({
             : "border-border/40 hover:shadow-xl"
       }`}>
         <CardHeader>
-          <CardTitle className="text-xl font-semibold leading-relaxed text-foreground">
+          <CardTitle className="text-md md:text-xl font-semibold leading-relaxed text-foreground">
             {questionText}
           </CardTitle>
         </CardHeader>
@@ -107,12 +107,12 @@ export default function QuizQuestionCard({
 
                   <div className="flex items-center gap-4 relative z-10 w-full">
                     {/* Enhanced Option Badge */}
-                    <div className={`flex-shrink-0 w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-bold transition-all duration-300 ${badgeColorClass}`}>
+                    <div className={`flex-shrink-0 text-xs md:text-xl w-5 h-5 md:w-10 md:h-10 rounded-full border-2 flex items-center justify-center font-bold transition-all duration-300 ${badgeColorClass}`}>
                       {optionLetter}
                     </div>
 
                     {/* Option Text */}
-                    <span className={`flex-1 text-base leading-relaxed transition-all duration-300 ${textColorClass}`}>
+                    <span className={`flex-1 text-xs md:text-base  leading-relaxed transition-all duration-300 ${textColorClass}`}>
                       {option}
                     </span>
 

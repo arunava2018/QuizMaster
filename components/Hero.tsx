@@ -7,7 +7,7 @@ export default function Hero() {
     router.push("/quiz");
   }
   return (
-    <section className="relative overflow-hidden py-15 mb-20 px-6 sm:px-12 lg:px-20 rounded-xl border border-border bg-gradient-to-br from-muted to-background/40 dark:from-muted/40 dark:to-background/20 transition-colors duration-300 m-10 shadow-sm">
+    <section className="relative overflow-hidden py-5 mb-20 px-6 sm:px-10 lg:px-20 rounded-xl border border-border bg-gradient-to-br from-muted to-background/40 dark:from-muted/40 dark:to-background/20 transition-colors duration-300 m-10 shadow-sm">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
         {/* Left Content */}
         <div className="flex flex-col gap-6 text-left">
@@ -37,9 +37,9 @@ export default function Hero() {
             </button>
 
             {/* Secondary CTA */}
-            <button className="btn-outline text-sm px-6 py-2.5 rounded-full font-medium hover:shadow-sm hover:-translate-y-0.5 transition-all duration-300">
+            {/* <button className="btn-outline text-sm px-6 py-2.5 rounded-full font-medium hover:shadow-sm hover:-translate-y-0.5 transition-all duration-300">
               Explore Topics
-            </button>
+            </button> */}
           </div>
         </div>
 

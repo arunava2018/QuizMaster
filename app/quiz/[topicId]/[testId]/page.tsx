@@ -24,15 +24,10 @@ export default function QuizPage() {
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [tempSelection, setTempSelection] = useState<{ [key: string]: string }>(
-    {}
-  );
-  const [savedAnswers, setSavedAnswers] = useState<{ [key: string]: string }>(
-    {}
-  );
+  const [tempSelection, setTempSelection] = useState<{ [key: string]: string }>({});
+  const [savedAnswers, setSavedAnswers] = useState<{ [key: string]: string }>({});
   const [timeLeft, setTimeLeft] = useState(20 * 60); // 20 minutes
 
-  // Fetch quiz questions
   useEffect(() => {
     if (!testId) return;
 
@@ -67,7 +62,6 @@ export default function QuizPage() {
     fetchQuiz();
   }, [testId, router]);
 
-  // Timer countdown
   useEffect(() => {
     if (loading) return;
     if (timeLeft <= 0) {
@@ -116,7 +110,6 @@ export default function QuizPage() {
     try {
       setSubmissionLoader(true);
       await axios.post(`/api/topics/${topicId}/attempts`);
-
       const timeTaken = 20 * 60 - timeLeft;
       await axios.post(`/api/quiz/${testId}/timer`, { timeTaken });
 
@@ -132,7 +125,6 @@ export default function QuizPage() {
     }
   };
 
-  // Initial loading animation
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center space-y-6">
@@ -143,29 +135,20 @@ export default function QuizPage() {
           </div>
         </div>
         <div className="text-center space-y-2 max-w-md">
-          <h2 className="text-xl font-semibold text-foreground">
-            Preparing Your Quiz
-          </h2>
+          <h2 className="text-xl font-semibold text-foreground">Preparing Your Quiz</h2>
           <p className="text-muted-foreground">
             Setting up questions and initializing your test environment...
           </p>
         </div>
         <div className="flex items-center space-x-1">
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-          <div
-            className="w-2 h-2 bg-primary rounded-full animate-bounce"
-            style={{ animationDelay: "0.1s" }}
-          ></div>
-          <div
-            className="w-2 h-2 bg-primary rounded-full animate-bounce"
-            style={{ animationDelay: "0.2s" }}
-          ></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-100"></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-200"></div>
         </div>
       </div>
     );
   }
 
-  // Completed test UI
   if (completed) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
@@ -174,7 +157,7 @@ export default function QuizPage() {
           <p className="text-muted-foreground mb-6">
             This test session has already been completed. You can view your results or return to the quiz list.
           </p>
-          <div className="flex gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => router.push(`/quiz/result/${testId}`)}
               className="px-6 py-2 bg-accent rounded hover:opacity-95"
@@ -193,11 +176,9 @@ export default function QuizPage() {
     );
   }
 
-  //Submission Loader
   if (submissionLoader) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center space-y-6">
-        {/* Circular progress ring */}
         <div className="relative">
           <div className="w-20 h-20 border-4 border-muted rounded-full animate-spin border-t-primary"></div>
           <div className="absolute inset-0 flex items-center justify-center">
@@ -206,31 +187,21 @@ export default function QuizPage() {
         </div>
 
         <div className="text-center space-y-2 max-w-md">
-          <h2 className="text-xl font-semibold text-foreground">
-            Submitting Your Quiz
-          </h2>
+          <h2 className="text-xl font-semibold text-foreground">Submitting Your Quiz</h2>
           <p className="text-muted-foreground">
             Please wait while we securely record your responses and calculate your score...
           </p>
         </div>
 
-        {/* Progress Dots */}
         <div className="flex items-center space-x-1">
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-          <div
-            className="w-2 h-2 bg-primary rounded-full animate-bounce"
-            style={{ animationDelay: "0.1s" }}
-          ></div>
-          <div
-            className="w-2 h-2 bg-primary rounded-full animate-bounce"
-            style={{ animationDelay: "0.2s" }}
-          ></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-100"></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-200"></div>
         </div>
       </div>
     );
   }
 
-  // No questions fallback
   if (questions.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -245,8 +216,9 @@ export default function QuizPage() {
     <div className="min-h-screen">
       <QuizHeader onEnd={handleSubmit} topicId={topicId} testId={testId} timeLeft={timeLeft} />
       <div className="container mx-auto px-4 py-6 max-w-[1400px]">
-        <div className="flex gap-8">
-          <div className="flex-1 space-y-6">
+        {/* Responsive Layout */}
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          <div className="flex-1 space-y-6 w-full">
             <QuizQuestionCard
               questionNumber={currentIndex + 1}
               totalQuestions={questions.length}
@@ -269,8 +241,9 @@ export default function QuizPage() {
             />
           </div>
 
-          <div className="w-64 flex-shrink-0">
-            <div className="sticky top-6">
+          {/* Move QuizNavigator below on small screens */}
+          <div className="w-full lg:w-64 flex-shrink-0">
+            <div className="lg:sticky lg:top-6">
               <QuizNavigator
                 total={questions.length}
                 currentIndex={currentIndex}

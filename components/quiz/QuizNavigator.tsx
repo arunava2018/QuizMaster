@@ -86,7 +86,7 @@ export default function QuizNavigator({
                   variant="outline"
                   size="sm"
                   className={cn(
-                    "w-full h-10 p-0 rounded font-semibold transition-all duration-200 border",
+                    "h-10 w-10 rounded-full font-semibold transition-all duration-200 border",
                     buttonClass,
                     isCurrent && "ring-2 ring-primary ring-offset-1"
                   )}
