@@ -28,10 +28,6 @@ export default function QuizHeader({
         <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
           Quiz in Progress
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Topic ID: <span className="font-medium">{topicId}</span> | Test ID:{" "}
-          <span className="font-medium">{testId}</span>
-        </p>
       </div>
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-lg border border-primary/20 shadow-sm">

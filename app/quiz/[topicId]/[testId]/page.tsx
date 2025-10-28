@@ -19,36 +19,29 @@ interface Question {
 export default function QuizPage() {
   const { topicId, testId } = useParams();
   const router = useRouter();
-
+  const [submissionLoader, setSubmissionLoader] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
-  const [completed, setCompleted] = useState(false); // new state to show completed UI
-
+  const [completed, setCompleted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Temporary selection (not saved)
   const [tempSelection, setTempSelection] = useState<{ [key: string]: string }>(
     {}
   );
-
-  // Saved responses (final)
   const [savedAnswers, setSavedAnswers] = useState<{ [key: string]: string }>(
     {}
   );
-
   const [timeLeft, setTimeLeft] = useState(20 * 60); // 20 minutes
 
+  // Fetch quiz questions
   useEffect(() => {
     if (!testId) return;
 
     const fetchQuiz = async () => {
       try {
         setLoading(true);
-        // small delay to show loading state
-        await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms delay
+        await new Promise((resolve) => setTimeout(resolve, 500));
         const res = await axios.get(`/api/quiz/${testId}`);
 
-        // server may return success payload
         if (res.data.success && res.data.questions?.length > 0) {
           setQuestions(res.data.questions);
         } else if (res.data.message === "Test already completed") {
@@ -59,9 +52,7 @@ export default function QuizPage() {
           router.push("/quiz");
         }
       } catch (error: any) {
-        // handle axios / HTTP errors explicitly
         if (axios.isAxiosError(error) && error.response?.status === 403) {
-          // test already completed
           setCompleted(true);
           toast.info("This test has already been completed.");
         } else {
@@ -76,7 +67,7 @@ export default function QuizPage() {
     fetchQuiz();
   }, [testId, router]);
 
-  // Timer
+  // Timer countdown
   useEffect(() => {
     if (loading) return;
     if (timeLeft <= 0) {
@@ -107,11 +98,8 @@ export default function QuizPage() {
         selectedAnswer: tempSelection[qid],
       });
 
-      if (res.data.success) {
-        toast.success("Answer saved successfully.");
-      } else {
-        toast.error("Failed to save answer.");
-      }
+      if (res.data.success) toast.success("Answer saved successfully.");
+      else toast.error("Failed to save answer.");
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to save answer");
       console.error("Error saving answer:", error);
@@ -122,38 +110,38 @@ export default function QuizPage() {
     if (currentIndex < questions.length - 1) setCurrentIndex((prev) => prev + 1);
   };
 
-  const handleJump = (index: number) => {
-    setCurrentIndex(index);
-  };
+  const handleJump = (index: number) => setCurrentIndex(index);
 
   const handleSubmit = async () => {
     try {
+      setSubmissionLoader(true);
       await axios.post(`/api/topics/${topicId}/attempts`);
-      //calculate time taken
+
       const timeTaken = 20 * 60 - timeLeft;
       await axios.post(`/api/quiz/${testId}/timer`, { timeTaken });
-      toast.success("Quiz submitted. Your responses are being evaluated.");
-      router.push(`/quiz/result/${testId}`);
+
+      toast.success("Quiz submitted. Redirecting to results...");
+      setTimeout(() => {
+        setSubmissionLoader(false);
+        router.push(`/quiz/result/${testId}`);
+      }, 1500);
     } catch (error) {
       console.error("Error recording user attempt:", error);
       toast.error("Failed to record user attempt.");
+      setSubmissionLoader(false);
     }
   };
 
+  // Initial loading animation
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center space-y-6">
-        {/* Animated Spinner */}
         <div className="relative">
-          {/* Outer rotating ring */}
           <div className="w-16 h-16 border-4 border-muted rounded-full animate-spin border-t-primary"></div>
-          {/* Inner pulsing dot */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-6 h-6 bg-primary/60 rounded-full animate-pulse"></div>
           </div>
         </div>
-
-        {/* Loading Content */}
         <div className="text-center space-y-2 max-w-md">
           <h2 className="text-xl font-semibold text-foreground">
             Preparing Your Quiz
@@ -162,8 +150,6 @@ export default function QuizPage() {
             Setting up questions and initializing your test environment...
           </p>
         </div>
-
-        {/* Progress Indicator */}
         <div className="flex items-center space-x-1">
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
           <div
@@ -179,7 +165,7 @@ export default function QuizPage() {
     );
   }
 
-  // Show friendly UI when server indicates test already completed (403)
+  // Completed test UI
   if (completed) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
@@ -188,7 +174,6 @@ export default function QuizPage() {
           <p className="text-muted-foreground mb-6">
             This test session has already been completed. You can view your results or return to the quiz list.
           </p>
-
           <div className="flex gap-3 justify-center">
             <button
               onClick={() => router.push(`/quiz/result/${testId}`)}
@@ -208,6 +193,44 @@ export default function QuizPage() {
     );
   }
 
+  //Submission Loader
+  if (submissionLoader) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center space-y-6">
+        {/* Circular progress ring */}
+        <div className="relative">
+          <div className="w-20 h-20 border-4 border-muted rounded-full animate-spin border-t-primary"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-8 h-8 bg-primary/60 rounded-full animate-ping"></div>
+          </div>
+        </div>
+
+        <div className="text-center space-y-2 max-w-md">
+          <h2 className="text-xl font-semibold text-foreground">
+            Submitting Your Quiz
+          </h2>
+          <p className="text-muted-foreground">
+            Please wait while we securely record your responses and calculate your score...
+          </p>
+        </div>
+
+        {/* Progress Dots */}
+        <div className="flex items-center space-x-1">
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+          <div
+            className="w-2 h-2 bg-primary rounded-full animate-bounce"
+            style={{ animationDelay: "0.1s" }}
+          ></div>
+          <div
+            className="w-2 h-2 bg-primary rounded-full animate-bounce"
+            style={{ animationDelay: "0.2s" }}
+          ></div>
+        </div>
+      </div>
+    );
+  }
+
+  // No questions fallback
   if (questions.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -221,7 +244,6 @@ export default function QuizPage() {
   return (
     <div className="min-h-screen">
       <QuizHeader onEnd={handleSubmit} topicId={topicId} testId={testId} timeLeft={timeLeft} />
-
       <div className="container mx-auto px-4 py-6 max-w-[1400px]">
         <div className="flex gap-8">
           <div className="flex-1 space-y-6">
@@ -232,7 +254,9 @@ export default function QuizPage() {
               options={currentQuestion.options}
               selectedAnswer={tempSelection[currentQuestion.questionId]}
               isSaved={!!savedAnswers[currentQuestion.questionId]}
-              onSelect={(answer) => handleAnswerSelect(currentQuestion.questionId, answer)}
+              onSelect={(answer) =>
+                handleAnswerSelect(currentQuestion.questionId, answer)
+              }
             />
 
             <QuizFooter
