@@ -2,6 +2,7 @@
 import { useParams } from "next/navigation";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { Trophy, ClipboardList } from "lucide-react";
 import UserInfo from "@/components/profile/userInfo";
 import UserTopicStats from "@/components/profile/UserTopicStats";
 
@@ -33,12 +34,10 @@ export default function ProfilePage() {
       }
     }
 
-    if (clerkUserId) {
-      fetchUser();
-    }
+    if (clerkUserId) fetchUser();
   }, [clerkUserId]);
 
-  // Loading skeleton component for better UX
+  // Loading skeleton for better UX
   const LoadingSkeleton = () => (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
@@ -53,7 +52,7 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-        
+
         {/* UserTopicStats skeleton */}
         <div className="w-full lg:w-2/3 xl:w-3/4">
           <div className="bg-card border rounded-lg p-6 animate-pulse">
@@ -65,10 +64,10 @@ export default function ProfilePage() {
     </div>
   );
 
-  if (loading) {
-    return <LoadingSkeleton />;
-  }
+  //If still loading
+  if (loading) return <LoadingSkeleton />;
 
+  //If user not found
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -86,26 +85,44 @@ export default function ProfilePage() {
     );
   }
 
+  const hasNoData =
+    user.totalTestsAttempted === 0 || user.topics.length === 0;
+
   return (
     <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
-      {/* Mobile-first responsive layout */}
+      {/* Responsive layout */}
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-        {/* User Info Section - Full width on mobile, 1/3 on large screens */}
+        {/* User Info Section */}
         <div className="w-full lg:w-1/3 xl:w-1/4">
           <div className="sticky top-6">
             <UserInfo userInfo={user} />
           </div>
         </div>
 
-        {/* User Topic Stats Section - Full width on mobile, 2/3 on large screens */}
+        {/* User Topic Stats Section or Empty State */}
         <div className="w-full lg:w-2/3 xl:w-3/4">
-          <UserTopicStats topics={user?.topics || []} />
+          {hasNoData ? (
+            <div className="bg-card border rounded-lg p-8 text-center flex flex-col items-center justify-center h-full min-h-[300px]">
+              <ClipboardList className="w-14 h-14 text-muted-foreground mb-4" />
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                No Test Data Yet
+              </h3>
+              <p className="text-muted-foreground mb-4 max-w-sm">
+                It looks like you haven’t attempted any quizzes yet. 
+                Start your first test to see your progress and performance stats here!
+              </p>
+              <a
+                href="/topics"
+                className="inline-flex items-center px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition"
+              >
+                <Trophy className="w-4 h-4 mr-2" />
+                Take Your First Quiz
+              </a>
+            </div>
+          ) : (
+            <UserTopicStats topics={user.topics} />
+          )}
         </div>
-      </div>
-
-      {/* Additional content section for future expansion */}
-      <div className="mt-8 lg:mt-12">
-        {/* Space for additional profile sections like achievements, recent activity, etc. */}
       </div>
     </div>
   );
