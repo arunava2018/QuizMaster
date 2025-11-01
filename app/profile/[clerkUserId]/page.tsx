@@ -112,7 +112,7 @@ export default function ProfilePage() {
                 Start your first test to see your progress and performance stats here!
               </p>
               <a
-                href="/topics"
+                href="/quiz"
                 className="inline-flex items-center px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition"
               >
                 <Trophy className="w-4 h-4 mr-2" />
